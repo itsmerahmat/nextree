@@ -25,13 +25,14 @@ enum LinkStatus {
 
 model User {
   id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(200)
   username    String       @unique @db.VarChar(50)
   email       String       @unique @db.VarChar(255)
   password    String       @db.VarChar(255)
   role        Role         @default(USER)
   image       String       @db.VarChar(255)
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now()) @updatedAt
   links       Link[]
   socials     SocialMedia[]
 }
@@ -45,7 +46,7 @@ model Link {
   userId      Int
   isActive    LinkStatus   @default(ACTIVE)
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now()) @updatedAt
 }
 
 model SocialMedia {
@@ -56,5 +57,5 @@ model SocialMedia {
   userId      Int
   isActive    Boolean      @default(true)
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now()) @updatedAt
 }
