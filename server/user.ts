@@ -4,6 +4,14 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 
+interface CreateUserInput {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  image?: string;
+}
+
 export async function getUsers(): Promise<User[]> {
   const users = await prisma.user.findMany();
   return users;
@@ -17,8 +25,10 @@ export async function getUserById(id: number): Promise<User> {
   return user;
 }
 
-export async function createUser(data: User): Promise<User> {
-  const user = await prisma.user.create({ data });
+export async function createUser(data: CreateUserInput): Promise<User> {
+  const user = await prisma.user.create({
+    data: { ...data, image: data.image ?? "" },
+  });
   revalidatePath("/users");
   return user;
 }
