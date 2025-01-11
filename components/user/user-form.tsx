@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createUser } from "@/server/user";
+import { createUser } from "@/actions/user";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 

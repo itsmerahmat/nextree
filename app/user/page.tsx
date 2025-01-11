@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUsers } from "@/server/user";
+import { getUsers } from "@/actions/user";
 import { User2Icon } from "lucide-react";
 import Link from "next/link";
 

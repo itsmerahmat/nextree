@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 interface CreateUserInput {
   name: string;
@@ -26,10 +26,11 @@ export async function getUserById(id: number): Promise<User> {
 }
 
 export async function createUser(data: CreateUserInput): Promise<User> {
+  // Hash the password
+  data.password = await bcrypt.hash(data.password, 10);
   const user = await prisma.user.create({
     data: { ...data, image: data.image ?? "" },
   });
-  revalidatePath("/users");
   return user;
 }
 
@@ -39,11 +40,9 @@ export async function updateUser(data: User): Promise<User> {
     where: { id: Number(id) },
     data: updateData,
   });
-  revalidatePath("/users");
   return user;
 }
 
 export async function deleteUser(id: number): Promise<void> {
   await prisma.user.delete({ where: { id } });
-  revalidatePath("/users");
 }
