@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { revalidatePath } from "next/cache";
 
 interface CreateUserInput {
   name: string;
@@ -12,37 +13,61 @@ interface CreateUserInput {
   image?: string;
 }
 
+interface UpdateUserInput {
+  id: number;
+  name?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+  image?: string;
+}
+
+async function hashPassword(password: string): Promise<string> {
+  return await bcrypt.hash(password, 10);
+}
+
 export async function getUsers(): Promise<User[]> {
-  const users = await prisma.user.findMany();
-  return users;
+  return await prisma.user.findMany();
 }
 
 export async function getUserById(id: number): Promise<User> {
-  const user = await prisma.user.findUnique({ where: { id } });
-  if (!user) {
+  const response = await prisma.user.findUnique({ where: { id } });
+  if (!response) {
     throw new Error("User not found");
   }
-  return user;
+  return response;
 }
 
 export async function createUser(data: CreateUserInput): Promise<User> {
-  // Hash the password
-  data.password = await bcrypt.hash(data.password, 10);
-  const user = await prisma.user.create({
-    data: { ...data, image: data.image ?? "" },
+  const hashedPassword = await hashPassword(data.password);
+  const response = await prisma.user.create({
+    data: { ...data, password: hashedPassword, image: data.image ?? "" },
   });
-  return user;
+  revalidatePath("/admin/users");
+  return response;
 }
 
-export async function updateUser(data: User): Promise<User> {
+export async function updateUser(data: UpdateUserInput): Promise<User> {
   const { id, ...updateData } = data;
-  const user = await prisma.user.update({
+  if ([undefined, null, ""].includes(updateData.password)) {
+    delete updateData.password;
+  } else {
+    updateData.password = await hashPassword(updateData.password!);
+  }
+  console.log("Update data:", updateData);
+  const response = await prisma.user.update({
     where: { id: Number(id) },
     data: updateData,
   });
-  return user;
+  revalidatePath("/admin/users");
+  return response;
 }
 
-export async function deleteUser(id: number): Promise<void> {
-  await prisma.user.delete({ where: { id } });
+export async function deleteUser(id: number): Promise<User> {
+  const response = await prisma.user.delete({ where: { id } });
+  if (!response) {
+    throw new Error("User not found");
+  }
+  revalidatePath("/admin/users");
+  return response;
 }
