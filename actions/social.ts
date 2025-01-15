@@ -2,8 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { SocialMedia } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
-interface CreateSocialInput {
+export interface CreateSocialInput {
   platform: string;
   url: string;
   userId: number;
@@ -19,7 +20,16 @@ interface UpdateSocialInput {
 }
 
 export async function getSocials(): Promise<SocialMedia[]> {
-  return await prisma.socialMedia.findMany();
+  return await prisma.socialMedia.findMany({
+    include: {
+      user: {
+        select: {
+          name: true,
+          username: true,
+        },
+      },
+    },
+  });
 }
 
 export async function getSocialById(id: number): Promise<SocialMedia> {
@@ -39,21 +49,27 @@ export async function getSocialByUserId(
 export async function createSocial(
   data: CreateSocialInput
 ): Promise<SocialMedia> {
-  return await prisma.socialMedia.create({
+  const response = await prisma.socialMedia.create({
     data: data,
   });
+  revalidatePath("/admin/social-media");
+  return response;
 }
 
 export async function updateSocial(
   data: UpdateSocialInput
 ): Promise<SocialMedia> {
   const { id, ...updateData } = data;
-  return await prisma.socialMedia.update({
+  const response = await prisma.socialMedia.update({
     where: { id: Number(id) },
     data: updateData,
   });
+  revalidatePath("/admin/social-media");
+  return response;
 }
 
-export async function deleteSocial(id: number): Promise<void> {
-  await prisma.socialMedia.delete({ where: { id } });
+export async function deleteSocial(id: number): Promise<SocialMedia> {
+  const response = prisma.socialMedia.delete({ where: { id } });
+  revalidatePath("/admin/social-media");
+  return response;
 }
