@@ -8,6 +8,12 @@ import { DeleteUserDialog } from "@/components/delete-alert";
 
 export const columns: ColumnDef<User>[] = [
   {
+    header: "No",
+    cell: ({ row }) => {
+      return <span>{row.index + 1}</span>;
+    },
+  },
+  {
     accessorKey: "name",
     header: "Name",
   },

@@ -12,6 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  FilterFn,
 } from "@tanstack/react-table";
 import { ChevronDown } from "lucide-react";
 
@@ -37,6 +38,14 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
+// Custom filter function for global search
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const globalFilterFn: FilterFn<any> = (row, columnId, value) => {
+  const searchValue = value.toLowerCase();
+  const cellValue = String(row.getValue(columnId)).toLowerCase();
+  return cellValue.includes(searchValue);
+};
+
 export function DataTable<TData, TValue>({
   columns,
   data,
@@ -45,6 +54,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
     data,
@@ -62,18 +72,19 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: globalFilterFn,
   });
 
   return (
     <div className="w-full">
       <div className="flex items-center pb-4">
         <Input
-          placeholder="Filter..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>

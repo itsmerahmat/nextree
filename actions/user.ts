@@ -5,7 +5,7 @@ import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 
-interface CreateUserInput {
+export interface CreateUserInput {
   name: string;
   username: string;
   email: string;
@@ -13,7 +13,7 @@ interface CreateUserInput {
   image?: string;
 }
 
-interface UpdateUserInput {
+export interface UpdateUserInput {
   id: number;
   name?: string;
   username?: string;
@@ -54,7 +54,6 @@ export async function updateUser(data: UpdateUserInput): Promise<User> {
   } else {
     updateData.password = await hashPassword(updateData.password!);
   }
-  console.log("Update data:", updateData);
   const response = await prisma.user.update({
     where: { id: Number(id) },
     data: updateData,
