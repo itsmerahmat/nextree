@@ -1,5 +1,5 @@
 "use client";
-import { User } from "@prisma/client";
+import { User } from "@/lib/session";
 import React, { createContext, useContext, ReactNode } from "react";
 
 interface UserSessionContextProps {

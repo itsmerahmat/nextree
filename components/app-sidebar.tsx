@@ -19,7 +19,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { User } from "@prisma/client";
+import { User } from "@/lib/session";
 
 // This is sample data.
 const data = {

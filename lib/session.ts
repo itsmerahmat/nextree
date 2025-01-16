@@ -8,20 +8,22 @@ const encodedKey = new TextEncoder().encode(secretKey);
 import { JWTPayload } from "jose";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-// import { User } from "@prisma/client";
 
 export interface SessionPayload extends JWTPayload {
   user: User;
   expiresAt: Date;
 }
 
-interface User {
+export interface User {
   id: number;
   name: string;
   username: string;
   email: string;
-  role?: string;
-  password?: string;
+  password: string;
+  role: string; // Adjust the type if you have a specific Role type
+  image: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export async function encrypt(payload: SessionPayload) {
