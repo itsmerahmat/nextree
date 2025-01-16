@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(200)
+  username    String       @unique @db.VarChar(50)
+  email       String       @unique @db.VarChar(255)
+  password    String       @db.VarChar(255)
+  role        Role         @default(USER)
+  image       String       @db.VarChar(255)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  links       Link[]
+  socials     SocialMedia[]
+}
+
+model Link {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(100)
+  url         String       @db.VarChar(255)
+  image       String?      @db.VarChar(255)
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+}
+
+model SocialMedia {
+  id          Int          @id @default(autoincrement())
+  platform    String       @db.VarChar(50)
+  url         String       @db.VarChar(255)
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+}
