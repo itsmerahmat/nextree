@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,23 +8,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Share2, Pencil, Trash } from "lucide-react";
+import { MoreHorizontal, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserLinkItemProps {
   href: string;
   title: string;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onShare?: () => void;
 }
 
-const UserLinkItem: React.FC<UserLinkItemProps> = ({
-  href,
-  title,
-  onEdit,
-  onDelete,
-  onShare,
-}) => {
+const UserLinkItem: React.FC<UserLinkItemProps> = ({ href, title }) => {
+  const { toast } = useToast();
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(href);
+      toast({
+        title: "URL Copied",
+        description: "The link has been copied to your clipboard.",
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: `Could not copy the URL to clipboard. ${err}`,
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <Card className="w-full md:w-1/2">
       <CardContent className="p-1">
@@ -45,24 +54,10 @@ const UserLinkItem: React.FC<UserLinkItemProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {onShare && (
-                <DropdownMenuItem onClick={onShare}>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  <span>Share</span>
-                </DropdownMenuItem>
-              )}
-              {onEdit && (
-                <DropdownMenuItem onClick={onEdit}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <span>Edit</span>
-                </DropdownMenuItem>
-              )}
-              {onDelete && (
-                <DropdownMenuItem onClick={onDelete}>
-                  <Trash className="mr-2 h-4 w-4" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={handleCopy}>
+                <Copy className="mr-2 h-4 w-4" />
+                <span>Copy</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -38,6 +38,17 @@ export async function getUserById(id: number): Promise<User> {
   return response;
 }
 
+export async function getUserByUsername(
+  username: string
+): Promise<User | null> {
+  const response = await prisma.user.findUnique({
+    where: { username },
+    include: { links: true, socials: true },
+  });
+  if (!response) return null;
+  return response;
+}
+
 export async function createUser(data: CreateUserInput): Promise<User> {
   const hashedPassword = await hashPassword(data.password);
   const response = await prisma.user.create({

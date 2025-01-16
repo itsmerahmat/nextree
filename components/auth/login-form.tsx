@@ -61,7 +61,12 @@ export function LoginForm({
           title: "Login success",
           description: "You have been logged in.",
         });
-        router.push("/");
+        // router.push("/");
+        if (response.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/user");
+        }
       }
     } catch (error) {
       console.error(error);
