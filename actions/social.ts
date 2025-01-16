@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { verifySession } from "@/lib/session";
 import { SocialMedia } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -20,6 +21,22 @@ interface UpdateSocialInput {
 }
 
 export async function getSocials(): Promise<SocialMedia[]> {
+  const session = await verifySession();
+  const userRole = session?.user?.role;
+  if (userRole !== "ADMIN") {
+    return await prisma.socialMedia.findMany({
+      where: { userId: session?.user?.id },
+      include: {
+        user: {
+          select: {
+            name: true,
+            username: true,
+          },
+        },
+      },
+    });
+  }
+
   return await prisma.socialMedia.findMany({
     include: {
       user: {

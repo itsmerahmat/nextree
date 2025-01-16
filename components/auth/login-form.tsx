@@ -63,9 +63,9 @@ export function LoginForm({
         });
         // router.push("/");
         if (response.role === "ADMIN") {
-          router.push("/admin");
+          router.push("/admin/user");
         } else {
-          router.push("/user");
+          router.push("/admin/links");
         }
       }
     } catch (error) {

@@ -8,21 +8,11 @@ const encodedKey = new TextEncoder().encode(secretKey);
 import { JWTPayload } from "jose";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { prisma } from "./prisma";
+import { User } from "@prisma/client";
 
 export interface SessionPayload extends JWTPayload {
   user: User;
   expiresAt: Date;
-}
-
-interface User {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  image: string;
-  role: "USER" | "ADMIN";
 }
 
 export async function encrypt(payload: SessionPayload) {
@@ -80,9 +70,6 @@ export const getUser = cache(async () => {
   if (!session) return null;
 
   try {
-    // const data = await prisma.user.findUnique({
-    //   where: { id: session.user.id },
-    // });
     const data = session.user;
     return data;
   } catch (error) {

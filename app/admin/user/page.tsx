@@ -9,9 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserModalForm } from "@/components/user/modal-form";
+import { verifySession } from "@/lib/session";
 
 export default async function UsersPage() {
   const users = await getUsers();
+  const session = await verifySession();
+  const userRole = session?.user?.role;
   return (
     <div className="mx-4">
       <Card>
@@ -19,7 +22,7 @@ export default async function UsersPage() {
           <CardTitle>
             <div className="flex justify-between items-start">
               <h1 className="text-xl">User</h1>
-              <UserModalForm />
+              {userRole === "ADMIN" && <UserModalForm />}
             </div>
           </CardTitle>
           <CardDescription>

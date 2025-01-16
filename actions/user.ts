@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { verifySession } from "@/lib/session";
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
@@ -27,6 +28,13 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 export async function getUsers(): Promise<User[]> {
+  const session = await verifySession();
+  const userRole = session?.user?.role;
+  if (userRole !== "ADMIN") {
+    return await prisma.user.findMany({
+      where: { id: session?.user?.id },
+    });
+  }
   return await prisma.user.findMany();
 }
 
@@ -43,7 +51,14 @@ export async function getUserByUsername(
 ): Promise<User | null> {
   const response = await prisma.user.findUnique({
     where: { username },
-    include: { links: true, socials: true },
+    include: {
+      links: {
+        where: { isActive: true },
+      },
+      socials: {
+        where: { isActive: true },
+      },
+    },
   });
   if (!response) return null;
   return response;

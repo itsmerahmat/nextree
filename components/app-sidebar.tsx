@@ -6,7 +6,7 @@ import {
   ContactRound,
   GalleryVerticalEnd,
   Link,
-  User,
+  User as UserIcon,
 } from "lucide-react";
 
 import { NavProjects } from "@/components/nav-projects";
@@ -19,6 +19,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { User } from "@prisma/client";
 
 // This is sample data.
 const data = {
@@ -34,7 +35,7 @@ const data = {
       plan: "Enterprise",
     },
   ],
-  projects: [
+  adminMenu: [
     {
       name: "Dashboard",
       url: "/admin",
@@ -43,7 +44,24 @@ const data = {
     {
       name: "User",
       url: "/admin/user",
-      icon: User,
+      icon: UserIcon,
+    },
+    {
+      name: "Link",
+      url: "/admin/links",
+      icon: Link,
+    },
+    {
+      name: "Social Media",
+      url: "/admin/social-media",
+      icon: ContactRound,
+    },
+  ],
+  userMenu: [
+    {
+      name: "User",
+      url: "/admin/user",
+      icon: UserIcon,
     },
     {
       name: "Link",
@@ -59,11 +77,7 @@ const data = {
 };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: {
-    name: string;
-    email: string;
-    image: string;
-  } | null;
+  user: User;
 }
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
@@ -73,10 +87,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
+        <NavProjects
+          projects={user?.role === "ADMIN" ? data.adminMenu : data.userMenu}
+        />
       </SidebarContent>
       <SidebarFooter>
-        {user ? <NavUser user={user} /> : <p>Please log in</p>}
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

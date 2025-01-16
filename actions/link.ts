@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { verifySession } from "@/lib/session";
 import { Link } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -21,6 +22,21 @@ export interface UpdateLinkInput {
 }
 
 export async function getLinks(): Promise<Link[]> {
+  const session = await verifySession();
+  const userRole = session?.user?.role;
+  if (userRole !== "ADMIN") {
+    return await prisma.link.findMany({
+      where: { userId: session?.user?.id },
+      include: {
+        user: {
+          select: {
+            name: true,
+            username: true,
+          },
+        },
+      },
+    });
+  }
   return await prisma.link.findMany({
     include: {
       user: {

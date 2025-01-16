@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useUserSession } from "@/context/user-session-context";
 
 const createSchema = z.object({
   title: z.string().min(2, {
@@ -58,7 +59,7 @@ export function LinkModalForm({ data, type = "Create" }: LinkFormProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
-
+  const { userSession } = useUserSession();
   useEffect(() => {
     getUsers().then((data: User[]) => setUsers(data));
   }, []);
@@ -70,7 +71,7 @@ export function LinkModalForm({ data, type = "Create" }: LinkFormProps) {
     defaultValues: {
       title: data?.title ?? "",
       url: data?.url ?? "",
-      userId: data?.userId ?? 0,
+      userId: data?.userId ?? userSession?.id,
       isActive: data?.isActive ?? true,
     },
   });
@@ -143,33 +144,35 @@ export function LinkModalForm({ data, type = "Create" }: LinkFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="userId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>User ID</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {userSession?.role === "ADMIN" && (
+              <FormField
+                control={form.control}
+                name="userId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User ID</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a user" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            {user.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="isActive"
