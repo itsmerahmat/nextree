@@ -19,7 +19,7 @@ export interface User {
   name: string;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   role: string; // Adjust the type if you have a specific Role type
   image: string;
   createdAt?: Date;
