@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AppSidebar } from "@/components/app-sidebar";
+import { ThemeProvider } from "@/components/theme-provider";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,8 +23,6 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await getUser();
-  console.log(user, "user");
-
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
